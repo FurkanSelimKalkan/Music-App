@@ -2,6 +2,7 @@ package com.application.music.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,16 +17,16 @@ public class Artist {
     private String name;
 
     @ManyToMany(mappedBy = "artists", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    private List<Track> tracks;
+    private List<Track> trackList = new ArrayList<>();
 
     @ManyToMany(cascade =  {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "artist_album", joinColumns = @JoinColumn(name = "artist_id"),
             inverseJoinColumns = @JoinColumn(name = "album_id"))
-    private List<Album> albumList;
+    private List<Album> albumList = new ArrayList<>();
 
-    public Artist(String name, List<Track> tracks, List<Album> albumList) {
+    public Artist(String name, List<Track> trackList, List<Album> albumList) {
         this.name = name;
-        this.tracks = tracks;
+        this.trackList = trackList;
         this.albumList = albumList;
     }
     public Artist(){}
@@ -42,12 +43,12 @@ public class Artist {
         this.name = name;
     }
 
-    public List<Track> getTracks() {
-        return tracks;
+    public List<Track> getTrackList() {
+        return trackList;
     }
 
-    public void setTracks(List<Track> tracks) {
-        this.tracks = tracks;
+    public void setTrackList(List<Track> tracks) {
+        this.trackList = tracks;
     }
 
     public List<Album> getAlbumList() {
@@ -59,12 +60,22 @@ public class Artist {
     }
 
     public void addTrack(Track track) {
-        tracks.add(track);
+        trackList.add(track);
         track.getArtists().add(this);
     }
 
     public void removeTrack(Track track) {
-        tracks.remove(track);
+        trackList.remove(track);
         track.getArtists().remove(this);
+    }
+
+    public void addAlbum(Album album) {
+        albumList.add(album);
+        album.getArtistList().add(this);
+    }
+
+    public void removeAlbum(Album album) {
+        albumList.remove(album);
+        album.getArtistList().remove(this);
     }
 }

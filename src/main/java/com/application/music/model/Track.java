@@ -2,6 +2,7 @@ package com.application.music.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,7 @@ public class Track {
     @JoinTable(name = "track_artist",
             joinColumns = @JoinColumn(name = "track_id"),
             inverseJoinColumns = @JoinColumn(name = "artist_id"))
-    private List<Artist> artists;
+    private List<Artist> artists = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "album_id")
@@ -29,6 +30,9 @@ public class Track {
         this.title = title;
         this.artists = artists;
         this.album = album;
+    }
+
+    public Track() {
     }
 
     public long getId() {
@@ -58,4 +62,15 @@ public class Track {
     public void setAlbum(Album album) {
         this.album = album;
     }
+
+    public void addArtist(Artist artist) {
+        artists.add(artist);
+        artist.getTrackList().add(this);
+    }
+
+    public void removeArtist(Artist artist) {
+        artists.remove(artist);
+        artist.getTrackList().remove(this);
+    }
+
 }
