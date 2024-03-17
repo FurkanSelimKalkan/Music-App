@@ -12,7 +12,8 @@ public class ArtistService {
     private ArtistRepository artistRepository;
 
     public Artist createArtist(String name) {
-        Artist artist = new Artist(name);
+        Artist artist = new Artist();
+        artist.setName(name);
         return artistRepository.save(artist);
     }
 
