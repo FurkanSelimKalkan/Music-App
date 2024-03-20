@@ -1,7 +1,8 @@
 package com.application.music.controller;
 
-import com.application.music.model.Artist;
-import com.application.music.service.ArtistService;
+import com.application.music.model.Track;
+import com.application.music.repository.TrackRepository;
+import com.application.music.service.TrackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,15 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/artists")
-public class ArtistController {
+@RequestMapping("/api/v1/tracks")
+public class TrackController {
 
     @Autowired
-    private ArtistService artistService;
+    TrackService trackService;
 
     @PostMapping
-    public ResponseEntity<Artist> createArtist(@RequestBody Artist artist) {
-        Artist newArtist = artistService.createArtist(artist);
-        return ResponseEntity.ok(newArtist);
+    public ResponseEntity<Track> create(@RequestBody Track track) {
+        return ResponseEntity.ok(trackService.create(track));
     }
 }

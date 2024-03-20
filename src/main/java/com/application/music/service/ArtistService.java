@@ -11,9 +11,7 @@ public class ArtistService {
     @Autowired
     private ArtistRepository artistRepository;
 
-    public Artist createArtist(String name) {
-        Artist artist = new Artist();
-        artist.setName(name);
+    public Artist createArtist(Artist artist) {
         return artistRepository.save(artist);
     }
 

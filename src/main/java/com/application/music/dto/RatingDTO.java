@@ -1,18 +1,21 @@
 package com.application.music.dto;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import java.math.BigDecimal;
+
 
 public class RatingDTO {
 
+
     @DecimalMax(value = "5.00", message = "Number cannot be Bigger than 5")
     @DecimalMin(value = "0.00", message = "Number cannot be smaller than 0")
-    private Double rating;
+    private BigDecimal rating;
 
-    public double getRating() {
+    public BigDecimal getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(BigDecimal rating) {
         this.rating = rating;
     }
 }

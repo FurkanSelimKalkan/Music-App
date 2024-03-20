@@ -1,11 +1,12 @@
 package com.application.music.dto;
 
-import com.application.music.model.Album;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class AlbumDTO {
@@ -13,13 +14,13 @@ public class AlbumDTO {
     private String name;
     private List<Long> artistIds =  new ArrayList<>();
     private List<Long> tracksIds = new ArrayList<>();
-    private Date releaseDate = new Date();
-    @DecimalMax(value = "5.00", message = "Number cannot be Bigger than 5")
+    private LocalDate releaseDate;
     @DecimalMin(value = "0.00", message = "Number cannot be smaller than 0")
-    private Double rating = 0.0;
+    @DecimalMax(value = "5.00", message = "Number cannot be Bigger than 5")
+    private BigDecimal rating = new BigDecimal(0);
     private Integer ratingCount = 0;
 
-    public AlbumDTO(Long id, String name, List<Long> artistIds, List<Long> tracksIds, Date releaseDate, Double rating, Integer ratingCount) {
+    public AlbumDTO(Long id, String name, List<Long> artistIds, List<Long> tracksIds, LocalDate releaseDate, BigDecimal rating, Integer ratingCount) {
         this.id = id;
         this.name = name;
         this.artistIds = artistIds;
@@ -65,19 +66,19 @@ public class AlbumDTO {
         this.tracksIds = tracksIds;
     }
 
-    public Date getReleaseDate() {
+    public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    public Double getRating() {
+    public BigDecimal getRating() {
         return rating;
     }
 
-    public void setRating(Double rating) {
+    public void setRating(BigDecimal rating) {
         this.rating = rating;
     }
 

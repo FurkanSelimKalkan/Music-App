@@ -2,8 +2,10 @@ package com.application.music.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -19,20 +21,20 @@ public class Album {
     @ManyToMany(mappedBy = "albumList", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private List<Artist> artistList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "album", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @Column(name = "tracks", nullable = false)
     private List<Track> trackList = new ArrayList<>();
 
     @Column(name = "release_date")
-    private Date releaseDate;
+    private LocalDate releaseDate;
 
     @Column(name = "rating_count")
-    private int ratingCount = 0;
+    private Integer ratingCount = 0;
 
     @Column(name = "rating")
-    private double rating = 0.0;
+    private BigDecimal rating = new BigDecimal(0);
 
-    public Album(String name, List<Artist> artistList, List<Track> trackList, Date releaseDate,int ratingCount, double rating) {
+    public Album(String name, List<Artist> artistList, List<Track> trackList, LocalDate releaseDate,int ratingCount, BigDecimal rating) {
         this.name = name;
         this.artistList = artistList;
         this.trackList = trackList;
@@ -72,11 +74,11 @@ public class Album {
         this.trackList = tracks;
     }
 
-    public Date getReleaseDate() {
+    public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
 
@@ -88,11 +90,11 @@ public class Album {
         this.ratingCount = ratingCount;
     }
 
-    public double getRating() {
+    public BigDecimal getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(BigDecimal rating) {
         this.rating = rating;
     }
 
@@ -116,11 +118,15 @@ public class Album {
         track.setAlbum(null);
     }
 
-    public void addRating(double newRating) {
-        double totalRating = this.rating * this.ratingCount + newRating;
+
+
+    public void addRating(BigDecimal newRating) {
+        BigDecimal totalRating = this.rating.multiply(BigDecimal.valueOf(this.ratingCount)).add(newRating);
         this.ratingCount++;
-        this.rating = totalRating / this.ratingCount;
+        BigDecimal newCount = BigDecimal.valueOf(this.ratingCount);
+        this.rating = totalRating.divide(newCount, 2, RoundingMode.HALF_UP);
     }
+
 
 
 }

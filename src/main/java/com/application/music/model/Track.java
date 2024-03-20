@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Track {
+public class Track extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private long id;
+    private Long id;
 
     @Column(name = "name", nullable = false)
     private String title;
@@ -35,7 +35,7 @@ public class Track {
     public Track() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
