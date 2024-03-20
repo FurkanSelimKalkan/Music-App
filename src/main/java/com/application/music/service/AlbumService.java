@@ -53,6 +53,13 @@ public class AlbumService {
     }
 
     @Transactional
+    public AlbumDTO findById(Long id) {
+        Album album = albumRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Album not found with id " + id));
+        return convertToDTO(album);
+    }
+
+    @Transactional
     public AlbumDTO create(AlbumDTO albumDTO) {
         Album album = new Album();
         album.setName(albumDTO.getName());
@@ -85,9 +92,8 @@ public class AlbumService {
         return convertToDTO(savedAlbum);
     }
 
-
     @Transactional
-    public AlbumDTO updateAlbum(Long id, AlbumDTO albumDTO) {
+    public AlbumDTO update(Long id, AlbumDTO albumDTO) {
         Album album = albumRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Album not found"));
         album = updateAlbumFromDTO(albumDTO, album);
         Album updatedAlbum = albumRepository.save(album);
@@ -118,24 +124,14 @@ public class AlbumService {
         albumRepository.deleteById(albumId);
     }
 
-    @Transactional
-    public AlbumDTO findById(Long id) {
-        Album album = albumRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Album not found with id " + id));
-        return convertToDTO(album);
-    }
-
-    public boolean canDeleteAlbum(Album album) {
+    private boolean canDeleteAlbum(Album album) {
         BigDecimal ratingThreshold = new BigDecimal("4");
         int ratingCountThreshold = 10;
         boolean cannotDelete = album.getRating().compareTo(ratingThreshold) >= 0 && album.getRatingCount() >= ratingCountThreshold;
         return !cannotDelete;
     }
 
-
-
-    @Transactional
-    public Album updateAlbumFromDTO(AlbumDTO albumDTO, Album album) {
+    private Album updateAlbumFromDTO(AlbumDTO albumDTO, Album album) {
         updateTracks(albumDTO.getTracksIds(), album);
         updateArtists(albumDTO.getArtistIds(), album);
 
@@ -182,7 +178,7 @@ public class AlbumService {
     }
 
 
-    public AlbumDTO convertToDTO(Album album) {
+    private AlbumDTO convertToDTO(Album album) {
         AlbumDTO albumDTO = new AlbumDTO();
 
         albumDTO.setId(album.getId());

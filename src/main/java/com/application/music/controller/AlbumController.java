@@ -60,7 +60,7 @@ public class AlbumController {
 
     @PatchMapping(path = "/{id}")
     public ResponseEntity<?> updateAlbum(@PathVariable Long id, @RequestBody AlbumDTO albumDTO) {
-            AlbumDTO updatedAlbum = albumService.updateAlbum(id, albumDTO);
+            AlbumDTO updatedAlbum = albumService.update(id, albumDTO);
             return ResponseEntity.ok(updatedAlbum);
     }
 
