@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -61,5 +62,31 @@ public class AlbumServiceTest {
     @Test
     @DisplayName("Should create a album")
     public void testCreateAlbum() {
+    }
+
+    @Test
+    @DisplayName("Album can be created with valid data")
+    public void whenCreateAlbumWithValidData_thenAlbumIsCreated() {
+        AlbumDTO albumDTO = new AlbumDTO();
+        albumDTO.setName("Neues Album");
+        albumDTO.setReleaseDate(Date.valueOf("2021-01-01").toLocalDate());
+        albumDTO.setRating(new BigDecimal("5"));
+        albumDTO.setRatingCount(1);
+
+        Album savedAlbum = new Album();
+        savedAlbum.setId(1L);
+        savedAlbum.setName(albumDTO.getName());
+        savedAlbum.setReleaseDate(albumDTO.getReleaseDate());
+        savedAlbum.setRating(albumDTO.getRating());
+        savedAlbum.setRatingCount(albumDTO.getRatingCount());
+
+        when(albumRepository.save(any(Album.class))).thenReturn(savedAlbum);
+
+        AlbumDTO result = albumService.create(albumDTO);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getName()).isEqualTo(albumDTO.getName());
+        verify(albumRepository).save(any(Album.class));
     }
 }
