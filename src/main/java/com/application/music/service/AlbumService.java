@@ -24,13 +24,8 @@ import java.util.stream.Collectors;
 @Service
 public class AlbumService {
 
-    @Autowired
     private final AlbumRepository albumRepository;
-
-    @Autowired
     private final ArtistRepository artistRepository;
-
-    @Autowired
     private  final TrackRepository trackRepository;
 
     @Autowired
@@ -61,34 +56,12 @@ public class AlbumService {
 
     @Transactional
     public AlbumDTO create(AlbumDTO albumDTO) {
-        Album album = new Album();
-        album.setName(albumDTO.getName());
-        album.setReleaseDate(albumDTO.getReleaseDate());
-        album.setRating(albumDTO.getRating());
-        album.setRatingCount(albumDTO.getRatingCount());
-
+        Album album = mapDtoToAlbum(albumDTO);
         Album savedAlbum = albumRepository.save(album);
 
-        if (albumDTO.getTracksIds() != null && !albumDTO.getTracksIds().isEmpty()) {
-            List<Track> tracks = trackRepository.findAllById(albumDTO.getTracksIds());
-            if(tracks.size() != albumDTO.getTracksIds().size()) {
-                Set<Long> foundIds = tracks.stream().map(Track::getId).collect(Collectors.toSet());
-                Set<Long> missingIds = new HashSet<>(albumDTO.getTracksIds());
-                missingIds.removeAll(foundIds);
-                throw new EntityNotFoundException("Track IDs not found: " + missingIds);
-            }
-            for (Track track : tracks) {
-                savedAlbum.addTrack(track);
-            }
-            savedAlbum = albumRepository.save(savedAlbum);
-        }
+        handleTracks(albumDTO.getTracksIds(), savedAlbum);
+        handleArtists(albumDTO.getArtistIds(), savedAlbum);
 
-        if (albumDTO.getArtistIds() != null && !albumDTO.getArtistIds().isEmpty()) {
-            List<Artist> artists = artistRepository.findAllById(albumDTO.getArtistIds());
-            for (Artist artist : artists) {
-                savedAlbum.addArtist(artist);
-            }
-        }
         return convertToDTO(savedAlbum);
     }
 
@@ -131,6 +104,31 @@ public class AlbumService {
         return !cannotDelete;
     }
 
+    private Album mapDtoToAlbum(AlbumDTO albumDTO) {
+        Album album = new Album();
+        album.setName(albumDTO.getName());
+        album.setReleaseDate(albumDTO.getReleaseDate());
+        album.setRating(albumDTO.getRating());
+        album.setRatingCount(albumDTO.getRatingCount());
+        return album;
+    }
+
+    private void handleTracks(List<Long> trackIds, Album album) {
+        if (trackIds != null && !trackIds.isEmpty()) {
+            List<Track> tracks = trackRepository.findAllById(trackIds);
+            validateFoundEntities(trackIds, tracks, "Track");
+            tracks.forEach(album::addTrack);
+        }
+    }
+
+    private void handleArtists(List<Long> artistIds, Album album) {
+        if (artistIds != null && !artistIds.isEmpty()) {
+            List<Artist> artists = artistRepository.findAllById(artistIds);
+            validateFoundEntities(artistIds, artists, "Artist");
+            artists.forEach(album::addArtist);
+        }
+    }
+
     private Album updateAlbumFromDTO(AlbumDTO albumDTO, Album album) {
         updateTracks(albumDTO.getTracksIds(), album);
         updateArtists(albumDTO.getArtistIds(), album);
@@ -169,14 +167,14 @@ public class AlbumService {
         }
     }
 
-    private <T extends BaseEntity> void validateFoundEntities(List<Long> ids, List<T> foundEntities, String entityType) {
-        if (foundEntities.size() != ids.size()) {
-            Set<Long> missingIds = new HashSet<>(ids);
-            foundEntities.forEach(entity -> missingIds.remove(entity.getId()));
-            throw new EntityNotFoundException(entityType + " IDs not found: " + missingIds);
+    private <T extends BaseEntity> void validateFoundEntities(List<Long> ids, List<T> entities, String entityType) {
+        Set<Long> foundIds = entities.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+        Set<Long> requestedIds = new HashSet<>(ids);
+        requestedIds.removeAll(foundIds);
+        if (!requestedIds.isEmpty()) {
+            throw new EntityNotFoundException(entityType + " IDs not found: " + requestedIds);
         }
     }
-
 
     private AlbumDTO convertToDTO(Album album) {
         AlbumDTO albumDTO = new AlbumDTO();
