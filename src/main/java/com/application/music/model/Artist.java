@@ -1,11 +1,14 @@
 package com.application.music.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Data
+@EqualsAndHashCode(callSuper=false)
 public class Artist extends BaseEntity {
 
     @Id
@@ -23,41 +26,6 @@ public class Artist extends BaseEntity {
     @JoinTable(name = "artist_album", joinColumns = @JoinColumn(name = "artist_id"),
             inverseJoinColumns = @JoinColumn(name = "album_id"))
     private List<Album> albumList = new ArrayList<>();
-
-    public Artist(String name, List<Track> trackList, List<Album> albumList) {
-        this.name = name;
-        this.trackList = trackList;
-        this.albumList = albumList;
-    }
-    public Artist(){}
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Track> getTrackList() {
-        return trackList;
-    }
-
-    public void setTrackList(List<Track> tracks) {
-        this.trackList = tracks;
-    }
-
-    public List<Album> getAlbumList() {
-        return albumList;
-    }
-
-    public void setAlbumList(List<Album> albumList) {
-        this.albumList = albumList;
-    }
 
     public void addTrack(Track track) {
         trackList.add(track);

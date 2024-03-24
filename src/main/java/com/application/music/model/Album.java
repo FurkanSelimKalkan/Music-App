@@ -1,6 +1,7 @@
 package com.application.music.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -9,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Data
 public class Album {
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -34,74 +37,6 @@ public class Album {
     @Column(name = "rating")
     private BigDecimal rating = new BigDecimal(0);
 
-    public Album(String name, List<Artist> artistList, List<Track> trackList, LocalDate releaseDate,int ratingCount, BigDecimal rating) {
-        this.name = name;
-        this.artistList = artistList;
-        this.trackList = trackList;
-        this.releaseDate = releaseDate;
-        this.ratingCount = ratingCount;
-        this.rating = rating;
-    }
-
-    public Album() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Artist> getArtistList() {
-        return artistList;
-    }
-
-    public void setArtistList(List<Artist> artists) {
-        this.artistList = artists;
-    }
-
-    public List<Track> getTrackList() {
-        return trackList;
-    }
-
-    public void setTrackList(List<Track> tracks) {
-        this.trackList = tracks;
-    }
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
-    }
-
-    public int getRatingCount() {
-        return ratingCount;
-    }
-
-    public void setRatingCount(Integer ratingCount) {
-        this.ratingCount = ratingCount;
-    }
-
-    public BigDecimal getRating() {
-        return rating;
-    }
-
-    public void setRating(BigDecimal rating) {
-        this.rating = rating;
-    }
-
     public void addArtist(Artist artist) {
         artistList.add(artist);
         artist.getAlbumList().add(this);
@@ -122,15 +57,11 @@ public class Album {
         track.setAlbum(null);
     }
 
-
-
     public void addRating(BigDecimal newRating) {
         BigDecimal totalRating = this.rating.multiply(BigDecimal.valueOf(this.ratingCount)).add(newRating);
         this.ratingCount++;
         BigDecimal newCount = BigDecimal.valueOf(this.ratingCount);
         this.rating = totalRating.divide(newCount, 2, RoundingMode.HALF_UP);
     }
-
-
 
 }
