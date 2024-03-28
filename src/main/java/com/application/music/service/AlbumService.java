@@ -75,9 +75,10 @@ public class AlbumService {
     }
 
     @Transactional
-    public AlbumDTO addRating(Long albumId, BigDecimal newRating) {
+    public AlbumDTO addRating(Long albumId, Integer newRating) {
         Album updatedAlbum = albumRepository.getReferenceById(albumId);
-        updatedAlbum.addRating(newRating);
+        BigDecimal convertedNewRating = BigDecimal.valueOf(newRating);
+        updatedAlbum.addRating(convertedNewRating);
         updatedAlbum = albumRepository.save(updatedAlbum);
         return convertToDTO(updatedAlbum);
     }
