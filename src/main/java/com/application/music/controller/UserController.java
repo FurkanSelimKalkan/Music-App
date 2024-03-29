@@ -50,7 +50,6 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        // Hier könntest du Details zum authentifizierten Benutzer und das JWT zurückgeben
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
 }
