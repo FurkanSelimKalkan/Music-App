@@ -81,7 +81,7 @@ public class AlbumRestControllerTest {
     @DisplayName("Reject rating when out of valid range")
     public void whenAddInvalidRatingToAlbum_thenValidationError() throws Exception {
         RatingDTO ratingDTO = new RatingDTO();
-        ratingDTO.setRating(new BigDecimal("6.0"));
+        ratingDTO.setRating(6);
 
         mockMvc.perform(patch("/api/v1/albums/{id}/rating", 1L)
                         .contentType(MediaType.APPLICATION_JSON)

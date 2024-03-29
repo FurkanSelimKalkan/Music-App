@@ -11,14 +11,12 @@ import com.application.music.repository.ArtistRepository;
 import com.application.music.repository.TrackRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,12 +25,14 @@ public class AlbumService {
     private final AlbumRepository albumRepository;
     private final ArtistRepository artistRepository;
     private  final TrackRepository trackRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public AlbumService(AlbumRepository albumRepository, ArtistRepository artistRepository, TrackRepository trackRepository) {
+    public AlbumService(AlbumRepository albumRepository, ArtistRepository artistRepository, TrackRepository trackRepository, RabbitTemplate rabbitTemplate) {
         this.albumRepository = albumRepository;
         this.artistRepository = artistRepository;
         this.trackRepository = trackRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Transactional
@@ -62,7 +62,10 @@ public class AlbumService {
         handleTracks(albumDTO.getTracksIds(), savedAlbum);
         handleArtists(albumDTO.getArtistIds(), savedAlbum);
 
-        return convertToDTO(savedAlbum);
+        AlbumDTO newAlbumDto = convertToDTO(savedAlbum);
+
+        rabbitTemplate.convertAndSend("newAlbumQueue", newAlbumDto.getName());
+        return newAlbumDto;
     }
 
     @Transactional
@@ -201,4 +204,5 @@ public class AlbumService {
 
         return albumDTO;
     }
+
 }
