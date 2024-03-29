@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +45,14 @@ public class AlbumController {
     public ResponseEntity<AlbumDTO> createAlbum(@RequestBody @Valid AlbumDTO albumDTO) {
         AlbumDTO newAlbum = albumService.create(albumDTO);
         return ResponseEntity.ok(newAlbum);
+    }
+
+    @PostMapping(path = "/{albumId}/favorite")
+    public ResponseEntity<?> favoriteAlbum(@PathVariable Long albumId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        return ResponseEntity.ok(albumService.favoritiseAlbum(username, albumId));
     }
 
     @PatchMapping(path = "/{id}/rating")

@@ -5,10 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,11 +31,19 @@ public class User extends Auditable {
     private String password;
 
     @OneToMany
-    private List<Album> favoritAlbums = new ArrayList<>();
+    private List<Album> favoriteAlbums = new ArrayList<>();
 
     @OneToMany
-    private List<Artist> favoritArtists = new ArrayList<>();
+    private List<Artist> favoriteArtists = new ArrayList<>();
 
     @OneToMany
-    private List<Track> favoritTracks = new ArrayList<>();
+    private List<Track> favoriteTracks = new ArrayList<>();
+
+    public void addFavoriteAlbum(Album album) {
+        favoriteAlbums.add(album);
+    }
+
+    public void removeFavoriteAlbum(Album album) {
+        favoriteAlbums.remove(album);
+    }
 }

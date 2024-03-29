@@ -2,13 +2,11 @@ package com.application.music.service;
 
 import com.application.music.dto.AlbumDTO;
 import com.application.music.exception.AlbumDeletionException;
-import com.application.music.model.Album;
-import com.application.music.model.Artist;
-import com.application.music.model.BaseEntity;
-import com.application.music.model.Track;
+import com.application.music.model.*;
 import com.application.music.repository.AlbumRepository;
 import com.application.music.repository.ArtistRepository;
 import com.application.music.repository.TrackRepository;
+import com.application.music.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -24,15 +22,17 @@ public class AlbumService {
 
     private final AlbumRepository albumRepository;
     private final ArtistRepository artistRepository;
+    private final UserRepository userRepository;
     private  final TrackRepository trackRepository;
     private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public AlbumService(AlbumRepository albumRepository, ArtistRepository artistRepository, TrackRepository trackRepository, RabbitTemplate rabbitTemplate) {
+    public AlbumService(AlbumRepository albumRepository, ArtistRepository artistRepository, TrackRepository trackRepository, UserRepository userRepository, RabbitTemplate rabbitTemplate) {
         this.albumRepository = albumRepository;
         this.artistRepository = artistRepository;
         this.trackRepository = trackRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -52,6 +52,20 @@ public class AlbumService {
         Album album = albumRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Album not found with id " + id));
         return convertToDTO(album);
+    }
+
+    @Transactional
+    public boolean favoritiseAlbum(String username, Long albumId) {
+        Album album = albumRepository.findById(albumId).orElseThrow( ()-> new EntityNotFoundException("Album not found with id " + albumId));
+        User user = userRepository.findByMail(username).orElseThrow( ()-> new EntityNotFoundException("User " + username + "not found"));
+
+        if(user.getFavoriteAlbums().contains(album)) {
+            user.removeFavoriteAlbum(album);
+            return false;
+        } else {
+            user.addFavoriteAlbum(album);
+            return true;
+        }
     }
 
     @Transactional
